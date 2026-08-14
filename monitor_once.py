@@ -27,7 +27,7 @@ def load_state():
                 return json.load(f)
         except Exception:
             pass
-    return {"chat_id": None, "categories": [], "seen": [], "sent_count": 0}
+    return {"chat_id": None, "categories": [], "seen": [], "sent_count": 0, "baseline_done": False}
 
 
 def save_state(st):
@@ -62,6 +62,18 @@ def main():
             print(f"[warn] загрузка кат {cat}: {e}")
 
     seen = set(st.get("seen", []))
+    current_ids = {w.get("id") for w in found if w.get("id")}
+
+    # Первый запуск: просто фиксируем базу, ничего не отправляем.
+    # Дальше отправляем только те объявления, которых ещё не было.
+    if not st.get("baseline_done"):
+        st["seen"] = sorted(current_ids)
+        st["baseline_done"] = True
+        save_state(st)
+        print(f"baseline: зафиксированы {len(current_ids)} текущих объявлений. "
+              f"Отправлять буду только новые.")
+        return
+
     new_wants = []
     for w in found:
         wid = w.get("id")
