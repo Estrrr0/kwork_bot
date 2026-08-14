@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import html
 import json
 import os
 import re
@@ -113,8 +114,8 @@ def want_to_text(want):
     price = want.get("priceLimit") or "—"
     budget = f"{price} ₽" if price != "—" else "не указан"
     time_left = want.get("timeLeft") or "—"
-    name = _clean(want.get("name") or "Заказ")
-    desc = _clean(want.get("description") or "")
+    name = html.escape(_clean(want.get("name") or "Заказ"))
+    desc = html.escape(_clean(want.get("description") or ""))
 
     text = (
         f"📌 <b>{name}</b>\n"
